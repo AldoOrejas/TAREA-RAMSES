@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Illustration of a GitHub Repository Model</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            
+            --main-color: #ef4444;
+            --develop-color: #10b981;
+            --feature1-color: #3b82f6;
+            --feature2-color: #8b5cf6;
+            --hotfix-color: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .canvas-container {
+            width: 100%;
+            max-width: 1400px;
+            background-color: var(--panel-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        header {
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            color: #38bdf8;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        svg {
+            width: 100%;
+            height: auto;
+            background-color: #0b1120;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* SVG Typography & Styling */
+        text {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .branch-line {
+            stroke-width: 3;
+            stroke-dasharray: 6 3;
+        }
+
+        .flow-arrow {
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .commit-node {
+            transition: all 0.2s ease;
+        }
+
+        .commit-node:hover {
+            r: 9;
+            cursor: pointer;
+        }
+
+        /* Legend Section */
+        .legend-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 16px;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.85rem;
+        }
+
+        .legend-box {
+            background-color: #0b1120;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .legend-box h3 {
+            font-size: 0.95rem;
+            color: #38bdf8;
+            margin-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 4px;
+        }
+
+        .cmd-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px 12px;
+            list-style: none;
+        }
+
+        .cmd-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge {
+            background-color: #0284c7;
+            color: white;
+            font-weight: bold;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #1e293b;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #f43f5e;
+            font-size: 0.8rem;
+        }
+
+        .branch-info-list {
+            list-style: none;
+        }
+
+        .branch-info-list li {
+            margin-bottom: 6px;
+        }
+
+        .print-btn {
+            background-color: #0284c7;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .print-btn:hover {
+            background-color: #0369a1;
+        }
+
+        @media print {
+            body {
+                background-color: white;
+                color: black;
+            }
+            .canvas-container {
+                box-shadow: none;
+                border: none;
+                max-width: 100%;
+            }
+            .print-btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="canvas-container">
+        <header>
+            <div>
+                <h1>Illustration of a GitHub Repository Model</h1>
+                <p class="subtitle">Git & GitHub Practice — Repositories, Branches, Commits and Workflows</p>
+            </div>
+            <button class="print-btn" onclick="window.print()">Guardar / Imprimir PDF</button>
+        </header>
+
+        <!-- MAIN DIAGRAM CANVAS -->
+        <svg viewBox="0 0 1300 680" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <!-- Arrow Markers -->
+                <marker id="arrow-main" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#ef4444" />
+                </marker>
+                <marker id="arrow-develop" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#10b981" />
+                </marker>
+                <marker id="arrow-feature" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b82f6" />
+                </marker>
+                <marker id="arrow-hotfix" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b" />
+                </marker>
+                <marker id="arrow-generic" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8" />
+                </marker>
+            </defs>
+
+            <!-- CONTAINER 1: REPOSITORY CONTAINER (OUTER) -->
+            <rect x="20" y="20" width="1260" height="640" rx="12" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="8 4"/>
+            <text x="40" y="45" fill="#cbd5e1" font-size="14" font-weight="bold">REPOSITORY CONTAINER: web-app-project</text>
+
+            <!-- SUB-CONTAINER: LOCAL COPY -->
+            <rect x="40" y="60" width="1220" height="340" rx="8" fill="#0f172a" fill-opacity="0.5" stroke="#334155" stroke-width="1.5"/>
+            <text x="55" y="82" fill="#94a3b8" font-size="12" font-weight="bold">LOCAL ENVIRONMENT (Local Copy / Working Tree)</text>
+
+            <!-- SUB-CONTAINER: REMOTE COPY (origin) -->
+            <rect x="40" y="410" width="1220" height="230" rx="8" fill="#0f172a" fill-opacity="0.8" stroke="#0284c7" stroke-width="1.5"/>
+            <text x="55" y="432" fill="#38bdf8" font-size="12" font-weight="bold">REMOTE ENVIRONMENT (origin / GitHub)</text>
+
+            <!-- BRANCH LINES (LOCAL) -->
+            <!-- main -->
+            <line x1="120" y1="120" x2="1200" y2="120" stroke="#ef4444" class="branch-line" />
+            <text x="125" y="112" fill="#ef4444" font-size="13" font-weight="bold">main</text>
+
+            <!-- hotfix/auth-fix -->
+            <line x1="280" y1="170" x2="520" y2="170" stroke="#f59e0b" class="branch-line" />
+            <text x="285" y="162" fill="#f59e0b" font-size="12" font-weight="bold">hotfix/auth-fix</text>
+
+            <!-- develop -->
+            <line x1="180" y1="230" x2="1200" y2="230" stroke="#10b981" class="branch-line" />
+            <text x="185" y="222" fill="#10b981" font-size="13" font-weight="bold">develop</text>
+
+            <!-- feature/login-form -->
+            <line x1="340" y1="290" x2="680" y2="290" stroke="#3b82f6" class="branch-line" />
+            <text x="345" y="282" fill="#3b82f6" font-size="12" font-weight="bold">feature/login-form</text>
+
+            <!-- feature/dashboard-ui -->
+            <line x1="720" y1="350" x2="1000" y2="350" stroke="#8b5cf6" class="branch-line" />
+            <text x="725" y="342" fill="#8b5cf6" font-size="12" font-weight="bold">feature/dashboard-ui</text>
+
+            <!-- BRANCH LINES (REMOTE ORIGIN) -->
+            <line x1="120" y1="480" x2="1200" y2="480" stroke="#ef4444" stroke-width="2" />
+            <text x="125" y="472" fill="#ef4444" font-size="12">origin/main</text>
+
+            <line x1="180" y1="560" x2="1200" y2="560" stroke="#10b981" stroke-width="2" />
+            <text x="185" y="552" fill="#10b981" font-size="12">origin/develop</text>
+
+            <!-- ================= INTEGRATION ARROWS & BRANCHING ================= -->
+
+            <!-- 1. create develop from main -->
+            <path d="M 180 120 L 180 230" stroke="#10b981" class="flow-arrow" marker-end="url(#arrow-develop)"/>
+
+            <!-- 2. create hotfix from main -->
+            <path d="M 280 120 L 280 170" stroke="#f59e0b" class="flow-arrow" marker-end="url(#arrow-hotfix)"/>
+
+            <!-- 3. create feature/login-form from develop -->
+            <path d="M 340 230 L 340 290" stroke="#3b82f6" class="flow-arrow" marker-end="url(#arrow-feature)"/>
+
+            <!-- 4. hotfix merge back to main -->
+            <path d="M 520 170 L 520 120" stroke="#f59e0b" class="flow-arrow" marker-end="url(#arrow-main)"/>
+            
+            <!-- 5. hotfix merge back to develop -->
+            <path d="M 520 170 C 520 200, 560 200, 560 230" stroke="#f59e0b" class="flow-arrow" marker-end="url(#arrow-develop)"/>
+
+            <!-- 6. feature/login-form merge to develop -->
+            <path d="M 680 290 L 680 230" stroke="#3b82f6" class="flow-arrow" marker-end="url(#arrow-develop)"/>
+
+            <!-- 7. create feature/dashboard-ui from develop -->
+            <path d="M 720 230 L 720 350" stroke="#8b5cf6" class="flow-arrow" marker-end="url(#arrow-generic)"/>
+
+            <!-- 8. feature/dashboard-ui merge to develop -->
+            <path d="M 1000 350 L 1000 230" stroke="#8b5cf6" class="flow-arrow" marker-end="url(#arrow-develop)"/>
+
+            <!-- 9. Release from develop to main -->
+            <path d="M 1120 230 C 1120 170, 1160 170, 1160 120" stroke="#10b981" stroke-dasharray="4 2" class="flow-arrow" marker-end="url(#arrow-main)"/>
+
+
+            <!-- ================= COMMITS & NODES ================= -->
+
+            <!-- C1: Initial Commit (main) -->
+            <circle cx="140" cy="120" r="7" fill="#ef4444"/>
+            <text x="110" y="95" fill="#f8fafc" font-size="10">docs: initial setup</text>
+
+            <!-- C2: Hotfix Commit -->
+            <circle cx="400" cy="170" r="7" fill="#f59e0b"/>
+            <text x="350" y="192" fill="#f8fafc" font-size="10">fix: patch security bug</text>
+
+            <!-- C3: Feature 1 - Commit 1 -->
+            <circle cx="420" cy="290" r="7" fill="#3b82f6"/>
+            <text x="370" y="312" fill="#f8fafc" font-size="10">feat: add login inputs</text>
+
+            <!-- C4: Feature 1 - Commit 2 -->
+            <circle cx="580" cy="290" r="7" fill="#3b82f6"/>
+            <text x="540" y="312" fill="#f8fafc" font-size="10">style: align submit btn</text>
+
+            <!-- C5: Feature 2 - Commit 1 -->
+            <circle cx="820" cy="350" r="7" fill="#8b5cf6"/>
+            <text x="770" y="372" fill="#f8fafc" font-size="10">feat: build dashboard layout</text>
+
+            <!-- C6: Feature 2 - Commit 2 -->
+            <circle cx="920" cy="350" r="7" fill="#8b5cf6"/>
+            <text x="880" y="372" fill="#f8fafc" font-size="10">docs: update UI specs</text>
+
+
+            <!-- MERGE COMMITS (Visibly Different: Square Nodes with Outer Ring) -->
+            <!-- M1: Hotfix Merge to Main -->
+            <rect x="512" y="112" width="16" height="16" fill="#f59e0b" stroke="#ffffff" stroke-width="2" />
+            <text x="470" y="95" fill="#f8fafc" font-size="10" font-weight="bold">Merge: hotfix/auth-fix</text>
+
+            <!-- M2: Feature 1 Merge to Develop -->
+            <rect x="672" y="222" width="16" height="16" fill="#3b82f6" stroke="#ffffff" stroke-width="2" />
+            <text x="620" y="210" fill="#f8fafc" font-size="10" font-weight="bold">Merge PR #1</text>
+
+            <!-- M3: Feature 2 Merge to Develop -->
+            <rect x="992" y="222" width="16" height="16" fill="#8b5cf6" stroke="#ffffff" stroke-width="2" />
+            <text x="950" y="210" fill="#f8fafc" font-size="10" font-weight="bold">Merge PR #2</text>
+
+            <!-- M4: Release Merge to Main -->
+            <rect x="1152" y="112" width="16" height="16" fill="#10b981" stroke="#ffffff" stroke-width="2" />
+            <text x="1110" y="95" fill="#f8fafc" font-size="10" font-weight="bold">Release v1.0.0</text>
+
+
+            <!-- PULL REQUEST OVERLAYS (GitHub Cloud) -->
+            <!-- PR #1 Box -->
+            <rect x="620" y="580" width="180" height="40" rx="4" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="630" y="598" fill="#38bdf8" font-size="11" font-weight="bold">PR #1: Login Implementation</text>
+            <text x="630" y="612" fill="#94a3b8" font-size="10">develop ← feature/login-form</text>
+
+            <!-- PR #2 Box -->
+            <rect x="930" y="580" width="180" height="40" rx="4" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="940" y="598" fill="#38bdf8" font-size="11" font-weight="bold">PR #2: Dashboard UI</text>
+            <text x="940" y="612" fill="#94a3b8" font-size="10">develop ← feature/dashboard-ui</text>
+
+
+            <!-- LOCAL TO REMOTE PUSH ARROWS -->
+            <!-- Push main -->
+            <path d="M 1160 128 L 1160 480" stroke="#ef4444" stroke-dasharray="4 4" class="flow-arrow" marker-end="url(#arrow-main)"/>
+            <circle cx="1160" cy="480" r="6" fill="#ef4444"/>
+
+            <!-- Push develop -->
+            <path d="M 1000 238 L 1000 560" stroke="#10b981" stroke-dasharray="4 4" class="flow-arrow" marker-end="url(#arrow-develop)"/>
+            <circle cx="1000" cy="560" r="6" fill="#10b981"/>
+
+
+            <!-- ================= NUMBERED COMMAND MARKERS (1 to 8+) ================= -->
+
+            <!-- Marker 1: git clone -->
+            <circle cx="70" cy="120" r="12" fill="#0284c7" />
+            <text x="70" y="124" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">1</text>
+
+            <!-- Marker 2: git switch -c develop -->
+            <circle cx="180" cy="180" r="12" fill="#0284c7" />
+            <text x="180" y="184" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">2</text>
+
+            <!-- Marker 3: git switch -c feature/login-form -->
+            <circle cx="340" cy="260" r="12" fill="#0284c7" />
+            <text x="340" y="264" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">3</text>
+
+            <!-- Marker 4: git add & git commit -->
+            <circle cx="420" cy="265" r="12" fill="#0284c7" />
+            <text x="420" y="269" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">4</text>
+
+            <!-- Marker 5: git push -u origin feature/login-form -->
+            <circle cx="680" cy="460" r="12" fill="#0284c7" />
+            <text x="680" y="464" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">5</text>
+
+            <!-- Marker 6: Pull Request on GitHub -->
+            <circle cx="710" cy="570" r="12" fill="#0284c7" />
+            <text x="710" y="574" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">6</text>
+
+            <!-- Marker 7: git merge --no-ff -->
+            <circle cx="672" cy="195" r="12" fill="#0284c7" />
+            <text x="672" y="199" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">7</text>
+
+            <!-- Marker 8: git tag v1.0.0 -->
+            <circle cx="1185" cy="112" r="12" fill="#0284c7" />
+            <text x="1185" y="116" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">8</text>
+
+        </svg>
+
+        <!-- LEGENDS & DESCRIPTIONS -->
+        <div class="legend-grid">
+            <!-- LEGEND 1: COMMANDS -->
+            <div class="legend-box">
+                <h3>Command & Action Legend</h3>
+                <ul class="cmd-list">
+                    <li class="cmd-item"><span class="badge">1</span> <code>git clone &lt;url&gt;</code> (Copy repo to local)</li>
+                    <li class="cmd-item"><span class="badge">2</span> <code>git switch -c develop</code> (Create develop)</li>
+                    <li class="cmd-item"><span class="badge">3</span> <code>git switch -c feature/*</code> (Create feature)</li>
+                    <li class="cmd-item"><span class="badge">4</span> <code>git add .</code> & <code>git commit -m</code></li>
+                    <li class="cmd-item"><span class="badge">5</span> <code>git push -u origin &lt;branch&gt;</code></li>
+                    <li class="cmd-item"><span class="badge">6</span> GitHub PR: Create base &#8592; compare</li>
+                    <li class="cmd-item"><span class="badge">7</span> <code>git merge --no-ff</code> (Merge commit)</li>
+                    <li class="cmd-item"><span class="badge">8</span> <code>git tag -a v1.0.0 -m "Release"</code></li>
+                </ul>
+            </div>
+
+            <!-- LEGEND 2: BRANCH FUNCTIONS -->
+            <div class="legend-box">
+                <h3>Branch Functions & Flow</h3>
+                <ul class="branch-info-list" style="font-size:0.78rem;">
+                    <li><strong style="color:#ef4444;">main:</strong> Production code. Starts at init commit. Receives releases & hotfixes.</li>
+                    <li><strong style="color:#10b981;">develop:</strong> Pre-production integration. Starts from <code>main</code>. Receives features & hotfixes.</li>
+                    <li><strong style="color:#3b82f6;">feature/*:</strong> Specific feature work. Starts from <code>develop</code>. Merges back to <code>develop</code>.</li>
+                    <li><strong style="color:#f59e0b;">hotfix/*:</strong> Urgent bug fixes. Starts from <code>main</code>. Merges to BOTH <code>main</code> & <code>develop</code>.</li>
+                </ul>
+            </div>
+
+            <!-- LEGEND 3: SHAPES & SYMBOLS -->
+            <div class="legend-box">
+                <h3>Shapes & Symbols</h3>
+                <ul class="branch-info-list" style="font-size:0.8rem;">
+                    <li>⚪ <strong>Circle Nodes:</strong> Ordinary Commits (<code>feat:</code>, <code>fix:</code>, <code>style:</code>, <code>docs:</code>)</li>
+                    <li>🔲 <strong>Square Nodes:</strong> Explicit Merge Commits</li>
+                    <li>➡️ <strong>Solid Arrows:</strong> Direct Branch / Integration Flow</li>
+                    <li>⬇️ <strong>Dashed Arrows:</strong> Push to Remote (<code>origin</code>)</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
